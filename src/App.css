@@ -9,10 +9,16 @@
     padding: 0;
     list-style: none;
 }
+.events li{
+    line-height: 1;
+}
 .events .ant-badge-status {
-    width: 100%;
     overflow: hidden;
     font-size: 12px;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.events .event-info{
+    font-size: 10px;
 }

@@ -16,7 +16,7 @@ const Navbar:FC = () => {
                     ?
                     <>
                         <div style={{color: 'white'}}>
-                            {user.username}
+                            {user.username.charAt(0).toUpperCase() + user.username.slice(1)}
                         </div>
                         <Menu theme="dark" mode="horizontal" selectable={false}>
 

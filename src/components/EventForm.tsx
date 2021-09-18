@@ -1,23 +1,32 @@
-import React, {FC, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {Button, DatePicker, Form, Input, Row, Select} from 'antd'
 import {rules} from "../utils/rules";
 import {IUser} from "../models/IUser";
 import {IEvent} from "../models/IEvent";
-import {Moment} from "moment";
-import {formatDate} from "../utils/date";
+import moment, {Moment} from "moment";
+import {disableDate, formatDate} from "../utils/date";
 import {useTypedSelector} from "../hooks/useTypeSelector";
 
 interface EventFormProps {
     guests: IUser[],
-    submit: (event: IEvent) => void
+    submit: (event: IEvent) => void,
+    defaultDate: Moment,
 }
 const EventForm: FC<EventFormProps> = (props) => {
     const [event, setEvent] = useState<IEvent>({
         author: '',
-        date: '',
+        date: props.defaultDate ? formatDate(props.defaultDate.toDate()) : '',
         description: '',
         guest: '',
     } as IEvent);
+
+    const [form] = Form.useForm()
+
+    const formInitial = {
+        description: '',
+        date: props.defaultDate,
+        guest: '',
+    }
 
     const {user} = useTypedSelector(state => state.auth)
 
@@ -31,9 +40,16 @@ const EventForm: FC<EventFormProps> = (props) => {
         props.submit({...event, author: user.username})
     }
 
+    useEffect(() => {
+        selectDate(props.defaultDate);
+        form.setFieldsValue(formInitial);
+    }, [form, props.defaultDate])
+
     return (
         <Form
+            form={form}
             onFinish={submitEvent}
+            initialValues={{date: props.defaultDate}}
         >
             <Form.Item
                 label="Event description"
@@ -50,6 +66,7 @@ const EventForm: FC<EventFormProps> = (props) => {
                 rules={[rules.required(), rules.isDateAfter("Can't create an event in the past")]}>
                 <DatePicker
                     onChange={(date) => selectDate(date)}
+                    disabledDate={disableDate}
                 />
             </Form.Item>
             <Form.Item

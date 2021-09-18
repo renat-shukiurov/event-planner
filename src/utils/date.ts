@@ -1,3 +1,4 @@
+import moment, {Moment} from "moment";
 
 const formatZero = (val: number, add: number = 0) => {
     let value = val;
@@ -10,4 +11,8 @@ export const formatDate = (date: Date): string => {
     const day = formatZero(date.getDate());
 
     return `${year}.${month}.${day}`;
+}
+
+export const disableDate = (date: Moment) => {
+    return date.isBefore(moment().add(-1, 'days'))
 }
