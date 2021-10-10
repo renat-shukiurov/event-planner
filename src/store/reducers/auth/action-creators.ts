@@ -2,7 +2,7 @@ import {AuthActionEnum, SetAuthAction, SetErrorAction, SetIsLoadingAction, SetUs
 import {IUser} from "../../../models/IUser";
 import {AppDispatch} from "../../index";
 import axios from "axios";
-import UserService from "../../../api/UserService";
+import {BACKEND_URL} from "../../../api";
 
 export const AuthActionCreators = {
     setUser: (user:IUser): SetUserAction => ({type: AuthActionEnum.SET_USER, payload: user}),
@@ -11,37 +11,95 @@ export const AuthActionCreators = {
     setError: (payload: string): SetErrorAction => ({type: AuthActionEnum.SET_ERROR, payload}),
     login: (username: string, password: string) => async (dispatch: AppDispatch) => {
         try {
-            dispatch(AuthActionCreators.setIsLoading(true))
+            dispatch(AuthActionCreators.setIsLoading(true));
 
-            // server response time imitation
-            setTimeout(async () => {
-                const response = await UserService.getUsers();
-                const mockUsers = response.data.find(user => user.username === username && user.password === password)
-                if (mockUsers){
-                    localStorage.setItem('auth', 'true');
-                    localStorage.setItem('username', mockUsers.username);
-                    dispatch(AuthActionCreators.setUser(mockUsers));
-                    dispatch(AuthActionCreators.setIsAuth(true));
-                } else {
-                    dispatch(AuthActionCreators.setError('Wrong login or password'));
-                }
+            try {
+                const response = await axios.post(`${BACKEND_URL}/auth/login`, {
+                    "email" : username,
+                    "password": password,
+                });
+                let user = {
+                    username: response.data.name,
+                    email: response.data.email,
+                };
+
+                dispatch(AuthActionCreators.setUser(user));
+                localStorage.setItem('token', response.data.token);
                 dispatch(AuthActionCreators.setIsLoading(false));
-            }, 1000)
+                dispatch(AuthActionCreators.setIsAuth(true));
+            }
+            catch (e:any) {
+                let messages = e.response.data.messages;
+                dispatch(AuthActionCreators.setError(messages.join("\r\n")));
+                dispatch(AuthActionCreators.setIsLoading(false));
+                dispatch(AuthActionCreators.setIsAuth(false));
+
+            }
 
         }
         catch (e) {
-            dispatch(AuthActionCreators.setError("Something went wrong"))
+            dispatch(AuthActionCreators.setError("Wrong password or email"));
+        }
+    },
+    register: (username: string, email: string, password: string) => async (dispatch: AppDispatch) => {
+        dispatch(AuthActionCreators.setIsLoading(true));
+
+        try {
+            const response = await axios.post(`${BACKEND_URL}/auth/registration`, {
+                "email" : email,
+                "name" : username,
+                "password": password,
+            })
+            localStorage.setItem('token', response.data.token);
+            let user = {
+                username: response.data.name,
+                email: response.data.email,
+                };
+
+            dispatch(AuthActionCreators.setUser(user));
+            dispatch(AuthActionCreators.setIsLoading(false));
+            dispatch(AuthActionCreators.setIsAuth(true));
+        }
+        catch (e:any) {
+            let messages = e.response.data.messages;
+            dispatch(AuthActionCreators.setError(messages.join("\r\n")));
+            dispatch(AuthActionCreators.setIsLoading(false))
+            dispatch(AuthActionCreators.setIsAuth(false));
+
         }
     },
     logout: () => async (dispatch: AppDispatch) => {
         try {
-            localStorage.removeItem('auth');
-            localStorage.removeItem('username');
+            localStorage.removeItem('token');
             dispatch(AuthActionCreators.setUser({} as IUser));
             dispatch(AuthActionCreators.setIsAuth(false));
         }
         catch (e) {
             console.log("Something went wrong", e)
         }
-    }
+    },
+    checkJWT: () => async (dispatch: AppDispatch) => {
+        dispatch(AuthActionCreators.setIsLoading(true));
+        try {
+            const response = await axios.get(`${BACKEND_URL}/auth/user`, {headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }});
+
+            let user = {
+                username: response.data.name,
+                email: response.data.email,
+            };
+
+            dispatch(AuthActionCreators.setUser(user));
+            localStorage.setItem('token', response.data.token);
+
+            dispatch(AuthActionCreators.setIsAuth(true));
+            dispatch(AuthActionCreators.setIsLoading(false));
+        }
+        catch (e:any) {
+            localStorage.removeItem('token');
+            dispatch(AuthActionCreators.setIsAuth(false));
+            dispatch(AuthActionCreators.setIsLoading(false));
+        }
+    },
 }

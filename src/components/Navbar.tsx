@@ -38,6 +38,12 @@ const Navbar:FC = () => {
                         >
                         Sign in
                         </Menu.Item>
+                        <Menu.Item
+                            onClick={() => router.push(RouteNames.REGISTER)}
+                            key={2}
+                        >
+                            Sign up
+                        </Menu.Item>
 
                     </Menu>
                 }

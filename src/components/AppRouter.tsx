@@ -1,34 +1,38 @@
 import React from 'react';
-
-import {Switch, Route, Redirect} from 'react-router-dom'
+import {Redirect, Route, Switch} from 'react-router-dom'
 import {privateRoutes, publicRoutes, RouteNames} from "../routes";
-import {useSelector} from "react-redux";
 import {useTypedSelector} from "../hooks/useTypeSelector";
+import {Spin} from "antd";
 
 const AppRouter = () => {
-    const {isAuth} = useTypedSelector(state => state.auth);
+    const {isAuth, isLoading} = useTypedSelector(state => state.auth);
     return (
-        isAuth
+        isLoading
             ?
-            <Switch>
-                {privateRoutes.map(route =>
-                    <Route path={route.path}
-                           exact={route.exact}
-                           component={route.component}
-                            key={route.path}/>
-                )}
-                <Redirect to={RouteNames.EVENT}/>
-            </Switch>
+            <Spin className="spinner-wrap" size="large" />
             :
-            <Switch>
-                {publicRoutes.map(route =>
-                    <Route path={route.path}
-                           exact={route.exact}
-                           component={route.component}
-                            key={route.path}/>
-                )}
-                <Redirect to={RouteNames.LOGIN}/>
-            </Switch>
+            (isAuth
+                ?
+                <Switch>
+                    {privateRoutes.map(route =>
+                        <Route path={route.path}
+                               exact={route.exact}
+                               component={route.component}
+                                key={route.path}/>
+                    )}
+                    <Redirect to={RouteNames.EVENT}/>
+                </Switch>
+                :
+                <Switch>
+                    {publicRoutes.map(route =>
+                        <Route path={route.path}
+                               exact={route.exact}
+                               component={route.component}
+                                key={route.path}/>
+                    )}
+                    <Redirect to={RouteNames.LOGIN}/>
+                </Switch>
+            )
 
     );
 };

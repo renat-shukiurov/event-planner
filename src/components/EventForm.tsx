@@ -3,7 +3,7 @@ import {Button, DatePicker, Form, Input, Row, Select} from 'antd'
 import {rules} from "../utils/rules";
 import {IUser} from "../models/IUser";
 import {IEvent} from "../models/IEvent";
-import moment, {Moment} from "moment";
+import {Moment} from "moment";
 import {disableDate, formatDate} from "../utils/date";
 import {useTypedSelector} from "../hooks/useTypeSelector";
 
@@ -50,6 +50,7 @@ const EventForm: FC<EventFormProps> = (props) => {
             form={form}
             onFinish={submitEvent}
             initialValues={{date: props.defaultDate}}
+            className="event-form"
         >
             <Form.Item
                 label="Event description"
@@ -75,7 +76,7 @@ const EventForm: FC<EventFormProps> = (props) => {
                 rules={[rules.required()]}>
                 <Select onChange={(guest:string) => setEvent({...event, guest})}>
                     {props.guests.map(guest =>
-                        <Select.Option key={guest.username} value={guest.username}>{guest.username}</Select.Option>
+                        <Select.Option key={guest.username} value={guest.email}>{guest.username}({guest.email})</Select.Option>
                     )}
                 </Select>
             </Form.Item>

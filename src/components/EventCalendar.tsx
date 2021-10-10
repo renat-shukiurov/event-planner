@@ -1,7 +1,7 @@
 import React, {FC} from 'react';
 import {Badge, Calendar} from "antd";
 import {IEvent} from "../models/IEvent";
-import moment, {Moment} from "moment";
+import {Moment} from "moment";
 import {disableDate, formatDate} from "../utils/date";
 
 interface EventCalendarProps {

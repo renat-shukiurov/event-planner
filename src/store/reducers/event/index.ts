@@ -4,7 +4,7 @@ import {IEvent} from "../../../models/IEvent";
 
 const initialState: EventState = {
     guests: [] as IUser[],
-    events: [] as IEvent[]
+    events: [] as IEvent[],
 }
 
 export default function EventReducer(state = initialState, action:EventAction): EventState{

@@ -3,16 +3,14 @@ import AppRouter from "./components/AppRouter";
 import Navbar from "./components/Navbar";
 import {Layout} from "antd";
 import './App.css'
-import {useActions} from "./hooks/useActions";
-import {IUser} from "./models/IUser";
+import {useDispatch} from "react-redux";
+import {AuthActionCreators} from "./store/reducers/auth/action-creators";
 
 const App:FC = () => {
-    const {setUser, setIsAuth} = useActions()
+    const dispatch = useDispatch();
     useEffect(() => {
-        if (localStorage.getItem('auth')){
-            setUser({username: localStorage.getItem('username' || '')} as IUser)
-            setIsAuth(true);
-        }
+        dispatch(AuthActionCreators.checkJWT());
+
     }, [])
 
     return (

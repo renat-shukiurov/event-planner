@@ -2,7 +2,7 @@ import moment, {Moment} from "moment";
 
 const formatZero = (val: number, add: number = 0) => {
     let value = val;
-    return value < 10 ? `0${value + add}` : value + add;
+    return value + add < 10 ? `0${value + add}` : value + add;
 }
 
 export const formatDate = (date: Date): string => {
