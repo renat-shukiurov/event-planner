@@ -61,11 +61,17 @@ export const AuthActionCreators = {
             dispatch(AuthActionCreators.setIsAuth(true));
         }
         catch (e:any) {
-            let messages = e.response.data.messages;
-            dispatch(AuthActionCreators.setError(messages.join("\r\n")));
+            let message;
+            if (e.response.data.message){
+                message = e.response.data.message
+            }
+            if (e.response.data.messages){
+                message = e.response.data.messages.join("\r\n");
+            }
+            if (message){
+                dispatch(AuthActionCreators.setError(message));
+            }
             dispatch(AuthActionCreators.setIsLoading(false))
-            dispatch(AuthActionCreators.setIsAuth(false));
-
         }
     },
     logout: () => async (dispatch: AppDispatch) => {
